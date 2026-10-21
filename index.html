@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>متجر بلايستيشن العربي | PlayStation Store</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts (Cairo) -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ps: {
+                            blue: '#00439C',
+                            lightBlue: '#0070D1',
+                            darkBg: '#090D16',
+                            cardBg: '#121826',
+                            cardHover: '#1A233A',
+                            accent: '#00F0FF',
+                            ps4: '#003791',
+                            ps5: '#FFFFFF'
+                        }
+                    },
+                    fontFamily: {
+                        cairo: ['Cairo', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Cairo', sans-serif;
+            background-color: #090D16;
+            color: #E2E8F0;
+        }
+        .glow-blue {
+            box-shadow: 0 0 25px rgba(0, 112, 209, 0.4);
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #090D16;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #0070D1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00F0FF;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between selection:bg-ps-lightBlue selection:text-white">
+
+    <!-- Header / Navbar -->
+    <header class="sticky top-0 z-40 bg-ps-darkBg/90 backdrop-blur-md border-b border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                
+                <!-- Logo & Admin Button Side-by-Side -->
+                <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-3 cursor-pointer" onclick="filterGames('all')">
+                        <i class="fa-brands fa-playstation text-4xl text-ps-lightBlue hover:text-ps-accent transition duration-300"></i>
+                        <div>
+                            <span class="text-2xl font-black tracking-wider text-white">PLAYSTATION</span>
+                            <span class="block text-xs text-ps-accent font-semibold tracking-widest">STORE EGYPT</span>
+                        </div>
+                    </div>
+
+                    <!-- Owner/Admin Button next to PlayStation Logo -->
+                    <button onclick="openAdminModal()" class="mr-2 px-3 py-1.5 bg-yellow-600/20 text-yellow-400 hover:bg-yellow-600 hover:text-white border border-yellow-500/40 rounded-xl font-bold text-xs transition flex items-center gap-1.5 shadow-sm" title="لوحة تحكم صاحب المحل">
+                        <i class="fa-solid fa-user-gear"></i>
+                        <span class="hidden sm:inline">صاحب المحل</span>
+                    </button>
+                </div>
+
+                <!-- Search Bar -->
+                <div class="hidden md:flex flex-1 max-w-md mx-8 relative">
+                    <input type="text" id="searchInput" oninput="handleSearch()" placeholder="ابحث عن لعبتك المفضلة..." 
+                        class="w-full bg-ps-cardBg border border-gray-700 rounded-full py-2.5 px-5 pr-12 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-ps-lightBlue transition">
+                    <i class="fa-solid fa-magnifying-glass absolute right-4 top-3.5 text-gray-400"></i>
+                </div>
+
+                <!-- Cart Button -->
+                <div class="flex items-center gap-4">
+                    <button onclick="toggleCart()" class="relative p-3 bg-ps-cardBg hover:bg-ps-cardHover rounded-full border border-gray-700 transition">
+                        <i class="fa-solid fa-cart-shopping text-xl text-ps-accent"></i>
+                        <span id="cartCount" class="absolute -top-1 -right-1 bg-red-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center border-2 border-ps-darkBg">0</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Mobile Search Bar -->
+            <div class="pb-4 md:hidden">
+                <div class="relative">
+                    <input type="text" id="mobileSearchInput" oninput="handleSearch(true)" placeholder="ابحث عن لعبة..." 
+                        class="w-full bg-ps-cardBg border border-gray-700 rounded-full py-2 px-4 pr-10 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-ps-lightBlue">
+                    <i class="fa-solid fa-magnifying-glass absolute right-3 top-2.5 text-gray-400"></i>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+
+        <!-- Hero Banner -->
+        <div class="relative rounded-3xl overflow-hidden mb-12 border border-gray-800 glow-blue">
+            <img src="https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?q=80&w=1600&auto=format&fit=crop" class="w-full h-[320px] sm:h-[420px] object-cover opacity-40" alt="PlayStation Gaming">
+            <div class="absolute inset-0 bg-gradient-to-t from-ps-darkBg via-transparent to-transparent"></div>
+            <div class="absolute bottom-8 right-8 left-8 text-right space-y-4">
+                <span class="bg-ps-lightBlue text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">عروض حصريّة</span>
+                <h1 class="text-3xl sm:text-5xl font-black text-white leading-tight">عالم بلايستيشن بين يديك</h1>
+                <p class="text-gray-300 max-w-xl text-sm sm:text-base">احصل على أشهر وأحدث ألعاب PS4 و PS5 بأفضل الأسعار المتاحة في مصر مع تسليم فوري وضمان كامل.</p>
+            </div>
+        </div>
+
+        <!-- Filter Tabs -->
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-8 border-b border-gray-800 pb-4">
+            <div class="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0">
+                <button onclick="filterGames('all')" id="btn-all" class="filter-btn px-5 py-2 rounded-xl font-bold text-sm transition bg-ps-lightBlue text-white">الكل</button>
+                <button onclick="filterGames('PS5')" id="btn-PS5" class="filter-btn px-5 py-2 rounded-xl font-bold text-sm transition bg-ps-cardBg text-gray-300 hover:bg-ps-cardHover">PS5</button>
+                <button onclick="filterGames('PS4')" id="btn-PS4" class="filter-btn px-5 py-2 rounded-xl font-bold text-sm transition bg-ps-cardBg text-gray-300 hover:bg-ps-cardHover">PS4</button>
+                <button onclick="filterGames('offer')" id="btn-offer" class="filter-btn px-5 py-2 rounded-xl font-bold text-sm transition bg-ps-cardBg text-gray-300 hover:bg-ps-cardHover">العروض الخصم 🔥</button>
+            </div>
+
+            <!-- Sort Option -->
+            <div class="flex items-center gap-2 text-sm text-gray-400">
+                <label for="sortSelect">ترتيب حسب:</label>
+                <select id="sortSelect" onchange="renderGames()" class="bg-ps-cardBg border border-gray-700 rounded-lg py-1.5 px-3 text-white text-sm focus:outline-none focus:border-ps-lightBlue">
+                    <option value="default">الافتراضي</option>
+                    <option value="price-low">السعر: من الأقل للأعلى</option>
+                    <option value="price-high">السعر: من الأعلى للأقل</option>
+                    <option value="rating">الأعلى تقييماً</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Games Grid -->
+        <div id="gamesGrid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <!-- Game cards injected dynamically via JavaScript -->
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-ps-cardBg border-t border-gray-800 mt-16 py-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center sm:text-right">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+                <div>
+                    <div class="flex items-center gap-2 justify-center sm:justify-start mb-4">
+                        <i class="fa-brands fa-playstation text-3xl text-ps-lightBlue"></i>
+                        <span class="text-xl font-bold text-white">متجر بلايستيشن العربي</span>
+                    </div>
+                    <p class="text-sm text-gray-400 leading-relaxed">وجهتك الأولى لشراء ألعاب بلايستيشن الرسمية في مصر بأفضل الأسعار وخدمة دعم فني متميزة.</p>
+                </div>
+                <div>
+                    <h3 class="text-white font-bold mb-3">طرق الدفع المتاحة</h3>
+                    <div class="flex items-center justify-center sm:justify-start gap-4 text-2xl text-gray-400">
+                        <i class="fa-solid fa-wallet hover:text-ps-accent transition" title="فودافون كاش"></i>
+                        <i class="fa-solid fa-credit-card hover:text-ps-accent transition" title="بطاقة ائتمان"></i>
+                        <i class="fa-brands fa-cc-visa hover:text-ps-accent transition"></i>
+                        <i class="fa-brands fa-cc-mastercard hover:text-ps-accent transition"></i>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-white font-bold mb-3">تواصل معنا</h3>
+                    <p class="text-sm text-gray-400"><i class="fa-solid fa-envelope ml-2 text-ps-accent"></i> support@ps-store.eg</p>
+                    <p class="text-sm text-gray-400 mt-2"><i class="fa-solid fa-phone ml-2 text-ps-accent"></i> +20 100 000 0000</p>
+                </div>
+            </div>
+            <div class="border-t border-gray-800 pt-6 text-xs text-gray-500 text-center">
+                جميع الحقوق محفوظة &copy; 2026 متجر بلايستيشن مصر.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Cart Drawer (Side Modal) -->
+    <div id="cartDrawer" class="fixed inset-0 z-50 overflow-hidden hidden">
+        <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" onclick="toggleCart()"></div>
+        <div class="fixed inset-y-0 left-0 max-w-full flex">
+            <div class="w-screen max-w-md bg-ps-cardBg border-r border-gray-800 text-white flex flex-col justify-between">
+                
+                <div class="p-6 border-b border-gray-800 flex items-center justify-between">
+                    <h2 class="text-xl font-bold flex items-center gap-2">
+                        <i class="fa-solid fa-cart-shopping text-ps-accent"></i> سلة المشتريات
+                    </h2>
+                    <button onclick="toggleCart()" class="text-gray-400 hover:text-white p-2">
+                        <i class="fa-solid fa-xmark text-xl"></i>
+                    </button>
+                </div>
+
+                <div id="cartItemsContainer" class="p-6 flex-1 overflow-y-auto space-y-4">
+                    <!-- Cart items rendered here -->
+                </div>
+
+                <div class="p-6 border-t border-gray-800 bg-ps-darkBg/50 space-y-4">
+                    <div class="flex justify-between items-center text-lg font-bold">
+                        <span>الإجمالي:</span>
+                        <span id="cartTotal" class="text-ps-accent">0 ج.م</span>
+                    </div>
+                    <button onclick="openCheckout()" class="w-full py-3 bg-ps-lightBlue hover:bg-blue-600 text-white font-bold rounded-xl transition glow-blue flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-shield-halved"></i> إتمام الشراء الآن
+                    </button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Details Modal -->
+    <div id="detailsModal" class="fixed inset-0 z-50 overflow-y-auto hidden">
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-black/80 backdrop-blur-md" onclick="closeDetailsModal()"></div>
+            <div class="inline-block align-bottom bg-ps-cardBg rounded-3xl text-right overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full border border-gray-800">
+                <div id="modalContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Control Panel Modal -->
+    <div id="adminModal" class="fixed inset-0 z-50 overflow-y-auto hidden">
+        <div class="flex items-center justify-center min-h-screen px-4 py-8">
+            <div class="fixed inset-0 bg-black/85 backdrop-blur-md" onclick="closeAdminModal()"></div>
+            <div class="relative bg-ps-cardBg rounded-3xl p-6 sm:p-8 max-w-2xl w-full border border-yellow-500/30 z-10 text-right">
+                <button onclick="closeAdminModal()" class="absolute top-4 left-4 text-gray-400 hover:text-white">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+                
+                <h3 class="text-2xl font-black text-yellow-400 mb-6 flex items-center gap-2 border-b border-gray-800 pb-4">
+                    <i class="fa-solid fa-user-shield"></i> لوحة إدارة ألعاب المتجر
+                </h3>
+
+                <!-- Password Login Area -->
+                <div id="adminLoginArea" class="space-y-4 py-6 text-center">
+                    <i class="fa-solid fa-lock text-5xl text-yellow-500 mb-2"></i>
+                    <h4 class="text-lg font-bold text-white">منطقة محمية لصاحب المحل</h4>
+                    <p class="text-xs text-gray-400">برجاء إدخال كلمة السر للوصول لإمكانية إضافة، تعديل أو حذف الألعاب</p>
+                    <div class="max-w-xs mx-auto space-y-3">
+                        <input type="password" id="adminPasswordInput" placeholder="أدخل كلمة السر" class="w-full bg-ps-darkBg border border-gray-700 rounded-xl py-2.5 px-4 text-center text-white text-sm focus:outline-none focus:border-yellow-500">
+                        <button onclick="verifyAdminPassword()" class="w-full py-2.5 bg-yellow-600 hover:bg-yellow-500 text-black font-bold rounded-xl transition">دخول</button>
+                    </div>
+                </div>
+
+                <!-- Admin Management Dashboard -->
+                <div id="adminDashboardArea" class="hidden space-y-6">
+                    <div class="flex justify-between items-center bg-ps-darkBg/50 p-3 rounded-xl border border-gray-800">
+                        <span class="text-xs text-green-400 font-bold flex items-center gap-1">
+                            <i class="fa-solid fa-circle-check"></i> تم تسجيل الدخول كصاحب المحل
+                        </span>
+                        <button onclick="logoutAdmin()" class="text-xs text-red-400 hover:underline">تسجيل الخروج</button>
+                    </div>
+
+                    <!-- Add / Edit Form -->
+                    <form onsubmit="saveGameFromAdmin(event)" class="bg-ps-darkBg p-4 rounded-2xl border border-gray-800 space-y-4">
+                        <h4 id="formTitle" class="font-bold text-ps-accent text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-plus-circle"></i> إضافة لعبة جديدة
+                        </h4>
+                        <input type="hidden" id="editGameId">
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">اسم اللعبة (بالعربي)</label>
+                                <input type="text" id="gameTitleAr" required placeholder="مثال: سبايدرمان 2" class="w-full bg-ps-cardBg border border-gray-700 rounded-lg p-2 text-xs text-white">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">الاسم بالإنجليزية</label>
+                                <input type="text" id="gameTitleEn" required placeholder="Marvel's Spider-Man 2" class="w-full bg-ps-cardBg border border-gray-700 rounded-lg p-2 text-xs text-white">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">المنصة</label>
+                                <select id="gamePlatform" class="w-full bg-ps-cardBg border border-gray-700 rounded-lg p-2 text-xs text-white">
+                                    <option value="PS5">PS5</option>
+                                    <option value="PS4">PS4</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">السعر (ج.م)</label>
+                                <input type="number" id="gamePrice" required placeholder="1850" class="w-full bg-ps-cardBg border border-gray-700 rounded-lg p-2 text-xs text-white">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">السعر قبل الخصم (اختياري)</label>
+                                <input type="number" id="gameOldPrice" placeholder="2200" class="w-full bg-ps-cardBg border border-gray-700 rounded-lg p-2 text-xs text-white">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">التقييم (من 5)</label>
+                                <input type="number" step="0.1" id="gameRating" value="4.8" class="w-full bg-ps-cardBg border border-gray-700 rounded-lg p-2 text-xs text-white">
+                            </div>
+                        </div>
+
+                        <!-- Image Selection Section (Upload File OR Enter URL) -->
+                        <div class="space-y-2 border-t border-b border-gray-800 py-3">
+                            <label class="block text-xs text-gray-300 font-bold">غلاف اللعبة:</label>
+                            
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-[11px] text-gray-400 mb-1">رفع صورة مباشرة من الجهاز:</label>
+                                    <input type="file" id="gameFileInput" accept="image/*" onchange="handleFileUpload(event)" class="w-full text-xs text-gray-400 bg-ps-cardBg border border-gray-700 rounded-lg p-1.5">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] text-gray-400 mb-1">أو إضافة رابط صورة (URL):</label>
+                                    <input type="url" id="gameImageUrl" placeholder="https://..." class="w-full bg-ps-cardBg border border-gray-700 rounded-lg p-2 text-xs text-white">
+                                </div>
+                            </div>
+                            <div id="imagePreviewContainer" class="hidden flex items-center gap-2 mt-2">
+                                <span class="text-xs text-gray-400">معاينة:</span>
+                                <img id="imagePreview" class="w-12 h-14 object-cover rounded border border-gray-700">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">وصف اللعبة</label>
+                            <textarea id="gameDescription" rows="2" placeholder="تفاصيل ومميزات اللعبة..." class="w-full bg-ps-cardBg border border-gray-700 rounded-lg p-2 text-xs text-white"></textarea>
+                        </div>
+
+                        <div class="flex justify-end gap-2">
+                            <button type="button" onclick="resetAdminForm()" class="px-3 py-2 bg-gray-800 text-gray-300 rounded-lg text-xs">إلغاء</button>
+                            <button type="submit" class="px-5 py-2 bg-green-600 hover:bg-green-500 text-white font-bold rounded-lg text-xs">حفظ اللعبة</button>
+                        </div>
+                    </form>
+
+                    <!-- Games List in Admin -->
+                    <div>
+                        <h4 class="font-bold text-white text-sm mb-3">قائمة الألعاب المعروضة حالياً:</h4>
+                        <div id="adminGamesList" class="space-y-2 max-h-60 overflow-y-auto pr-1">
+                            <!-- Injected dynamically -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Checkout Modal -->
+    <div id="checkoutModal" class="fixed inset-0 z-50 overflow-y-auto hidden">
+        <div class="flex items-center justify-center min-h-screen px-4 py-8">
+            <div class="fixed inset-0 bg-black/85 backdrop-blur-md" onclick="closeCheckoutModal()"></div>
+            <div class="relative bg-ps-cardBg rounded-3xl p-6 sm:p-8 max-w-md w-full border border-gray-800 z-10">
+                <button onclick="closeCheckoutModal()" class="absolute top-4 left-4 text-gray-400 hover:text-white">
+                    <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+                <h3 class="text-2xl font-bold text-white mb-6 text-center flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-credit-card text-ps-accent"></i> إتمام الطلب
+                </h3>
+                <form onsubmit="submitOrder(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-300 mb-1">الاسم بالكامل</label>
+                        <input type="text" required placeholder="محمد أحمد" class="w-full bg-ps-darkBg border border-gray-700 rounded-xl py-2.5 px-4 text-white text-sm focus:outline-none focus:border-ps-lightBlue">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-300 mb-1">رقم الهاتف (فودافون كاش / واتساب)</label>
+                        <input type="tel" required placeholder="01012345678" class="w-full bg-ps-darkBg border border-gray-700 rounded-xl py-2.5 px-4 text-white text-sm focus:outline-none focus:border-ps-lightBlue">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-300 mb-1">البريد الإلكتروني (لتسلم الكود/الحساب)</label>
+                        <input type="email" required placeholder="example@gmail.com" class="w-full bg-ps-darkBg border border-gray-700 rounded-xl py-2.5 px-4 text-white text-sm focus:outline-none focus:border-ps-lightBlue">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-300 mb-1">طريقة الدفع</label>
+                        <select class="w-full bg-ps-darkBg border border-gray-700 rounded-xl py-2.5 px-4 text-white text-sm focus:outline-none focus:border-ps-lightBlue">
+                            <option>فودافون كاش (Vodafone Cash)</option>
+                            <option>بطاقات بنكية (Visa / MasterCard)</option>
+                            <option>أمان / مصاري / InstaPay</option>
+                        </select>
+                    </div>
+                    <div class="pt-4">
+                        <button type="submit" class="w-full py-3.5 bg-green-600 hover:bg-green-500 text-white font-bold rounded-xl transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-circle-check"></i> تأكيد وإرسال الطلب
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Script -->
+    <script>
+        const fallbackImage = "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?q=80&w=800&auto=format&fit=crop";
+
+        const defaultGames = [
+            {
+                id: 1,
+                title: "سبايدرمان 2",
+                originalTitle: "Marvel's Spider-Man 2",
+                platform: "PS5",
+                price: 1850,
+                oldPrice: 2200,
+                rating: 4.9,
+                image: "https://images.unsplash.com/photo-1635863138275-d9b33299680b?q=80&w=800&auto=format&fit=crop",
+                description: "انطلق في مغامرة ملحمية جديدة مع بيتر باركر ومايلز موراليس لمواجهة التهديد النهائي لفينوم."
+            },
+            {
+                id: 2,
+                title: "جود أوف وار راجناروك",
+                originalTitle: "God of War Ragnarök",
+                platform: "PS5",
+                price: 1650,
+                oldPrice: 1950,
+                rating: 4.9,
+                image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=800&auto=format&fit=crop",
+                description: "انضم إلى كراتوس وآتريوس في رحلتهم عبر العوالم التسعة بحثاً عن الإجابات."
+            },
+            {
+                id: 3,
+                title: "قراند ثفت أوتو 5",
+                originalTitle: "Grand Theft Auto V",
+                platform: "PS5",
+                price: 950,
+                oldPrice: 1300,
+                rating: 4.8,
+                image: "https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=800&auto=format&fit=crop",
+                description: "استكشف مدينة لوس سانتوس في النسخة المحسّنة لأجهزة بلايستيشن 5 مع عالم GTA Online الشاسع."
+            },
+            {
+                id: 4,
+                title: "إي إيه إف سي 25",
+                originalTitle: "EA SPORTS FC 25",
+                platform: "PS5",
+                price: 2100,
+                oldPrice: 2400,
+                rating: 4.7,
+                image: "https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=800&auto=format&fit=crop",
+                description: "تجربة كرة القدم الأحدث والأكثر واقعية مع طور Rush الجديد وتكتيكات IQ المحدثة."
+            }
+        ];
+
+        // Load data from LocalStorage
+        let gamesData = JSON.parse(localStorage.getItem('ps_store_games')) || defaultGames;
+        let cart = [];
+        let currentFilter = 'all';
+        let uploadedBase64Image = "";
+
+        function saveGamesToStorage() {
+            localStorage.setItem('ps_store_games', JSON.stringify(gamesData));
+        }
+
+        function filterGames(category) {
+            currentFilter = category;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('bg-ps-lightBlue', 'text-white');
+                btn.classList.add('bg-ps-cardBg', 'text-gray-300');
+            });
+            const activeBtn = document.getElementById(`btn-${category}`);
+            if(activeBtn) {
+                activeBtn.classList.remove('bg-ps-cardBg', 'text-gray-300');
+                activeBtn.classList.add('bg-ps-lightBlue', 'text-white');
+            }
+            renderGames();
+        }
+
+        function handleSearch() {
+            renderGames();
+        }
+
+        function renderGames() {
+            const grid = document.getElementById('gamesGrid');
+            const searchVal = (document.getElementById('searchInput').value || document.getElementById('mobileSearchInput').value || '').toLowerCase();
+            const sortVal = document.getElementById('sortSelect').value;
+
+            let filtered = gamesData.filter(game => {
+                const discount = (game.oldPrice && game.oldPrice > game.price) ? Math.round(((game.oldPrice - game.price) / game.oldPrice) * 100) : 0;
+                
+                const matchesFilter = (currentFilter === 'all') || 
+                                     (currentFilter === 'offer' && discount > 0) || 
+                                     (game.platform === currentFilter);
+                
+                const matchesSearch = game.title.toLowerCase().includes(searchVal) || 
+                                      game.originalTitle.toLowerCase().includes(searchVal);
+
+                return matchesFilter && matchesSearch;
+            });
+
+            if (sortVal === 'price-low') {
+                filtered.sort((a, b) => a.price - b.price);
+            } else if (sortVal === 'price-high') {
+                filtered.sort((a, b) => b.price - a.price);
+            } else if (sortVal === 'rating') {
+                filtered.sort((a, b) => b.rating - a.rating);
+            }
+
+            grid.innerHTML = '';
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full text-center py-12 text-gray-400 space-y-3">
+                        <i class="fa-solid fa-gamepad text-5xl text-gray-600"></i>
+                        <p class="text-lg font-semibold">لم نجد أي ألعاب مطابقة لبحثك.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            filtered.forEach(game => {
+                const discount = (game.oldPrice && game.oldPrice > game.price) ? Math.round(((game.oldPrice - game.price) / game.oldPrice) * 100) : 0;
+                
+                const card = document.createElement('div');
+                card.className = "bg-ps-cardBg border border-gray-800 rounded-2xl overflow-hidden hover:border-ps-lightBlue transition duration-300 flex flex-col justify-between group hover:-translate-y-1 shadow-lg";
+                
+                card.innerHTML = `
+                    <div>
+                        <div class="relative overflow-hidden aspect-[3/4] bg-black">
+                            <img src="${game.image}" 
+                                 onerror="this.onerror=null; this.src='${fallbackImage}'" 
+                                 alt="${game.title}" 
+                                 class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            
+                            <span class="absolute top-3 right-3 text-xs font-black px-2.5 py-1 rounded-md shadow-md ${game.platform === 'PS5' ? 'bg-white text-black' : 'bg-ps-ps4 text-white'}">
+                                ${game.platform}
+                            </span>
+
+                            ${discount > 0 ? `<span class="absolute top-3 left-3 bg-red-600 text-white text-xs font-extrabold px-2 py-1 rounded-md shadow-md">خصم ${discount}%</span>` : ''}
+
+                            <div class="absolute bottom-3 right-3 bg-ps-darkBg/80 backdrop-blur-sm text-yellow-400 text-xs font-bold px-2 py-1 rounded-md flex items-center gap-1 border border-gray-700">
+                                <i class="fa-solid fa-star"></i>
+                                <span>${game.rating}</span>
+                            </div>
+                        </div>
+
+                        <div class="p-4 space-y-2">
+                            <h3 class="font-bold text-white text-lg group-hover:text-ps-accent transition truncate">${game.title}</h3>
+                            <p class="text-xs text-gray-400 truncate">${game.originalTitle}</p>
+                        </div>
+                    </div>
+
+                    <div class="p-4 border-t border-gray-800 flex items-center justify-between">
+                        <div>
+                            <div class="text-lg font-black text-ps-accent">${game.price} <span class="text-xs">ج.م</span></div>
+                            ${game.oldPrice ? `<div class="text-xs text-gray-500 line-through">${game.oldPrice} ج.م</div>` : ''}
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="openDetailsModal(${game.id})" class="p-2.5 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-xl transition" title="عرض التفاصيل">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
+                            <button onclick="addToCart(${game.id})" class="px-4 py-2 bg-ps-lightBlue hover:bg-blue-600 text-white font-bold rounded-xl transition flex items-center gap-2 shadow-md">
+                                <i class="fa-solid fa-cart-plus"></i> إضافة
+                            </button>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // Admin Auth Persistent Session
+        function checkAdminSession() {
+            return localStorage.getItem('ps_admin_session') === 'true';
+        }
+
+        function openAdminModal() {
+            document.getElementById('adminModal').classList.remove('hidden');
+            if (checkAdminSession()) {
+                document.getElementById('adminLoginArea').classList.add('hidden');
+                document.getElementById('adminDashboardArea').classList.remove('hidden');
+                renderAdminGamesList();
+            } else {
+                document.getElementById('adminLoginArea').classList.remove('hidden');
+                document.getElementById('adminDashboardArea').classList.add('hidden');
+            }
+        }
+
+        function closeAdminModal() {
+            document.getElementById('adminModal').classList.add('hidden');
+        }
+
+        function verifyAdminPassword() {
+            const pwd = document.getElementById('adminPasswordInput').value;
+            if (pwd === "11") {
+                localStorage.setItem('ps_admin_session', 'true');
+                document.getElementById('adminLoginArea').classList.add('hidden');
+                document.getElementById('adminDashboardArea').classList.remove('hidden');
+                renderAdminGamesList();
+            } else {
+                alert('كلمة السر غير صحيحة!');
+            }
+        }
+
+        function logoutAdmin() {
+            localStorage.removeItem('ps_admin_session');
+            document.getElementById('adminDashboardArea').classList.add('hidden');
+            document.getElementById('adminLoginArea').classList.remove('hidden');
+            document.getElementById('adminPasswordInput').value = '';
+        }
+
+        // Handle Image File Uploading
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    uploadedBase64Image = e.target.result;
+                    document.getElementById('imagePreview').src = uploadedBase64Image;
+                    document.getElementById('imagePreviewContainer').classList.remove('hidden');
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function renderAdminGamesList() {
+            const list = document.getElementById('adminGamesList');
+            list.innerHTML = gamesData.map(g => `
+                <div class="flex items-center justify-between bg-ps-cardBg p-2.5 rounded-xl border border-gray-800 text-xs">
+                    <div class="flex items-center gap-2">
+                        <img src="${g.image}" onerror="this.src='${fallbackImage}'" class="w-10 h-10 object-cover rounded">
+                        <div>
+                            <div class="font-bold text-white">${g.title}</div>
+                            <div class="text-gray-400">${g.price} ج.م (${g.platform})</div>
+                        </div>
+                    </div>
+                    <div class="flex gap-1">
+                        <button onclick="editGame(${g.id})" class="px-2 py-1 bg-blue-600/30 text-blue-400 hover:bg-blue-600 hover:text-white rounded">تعديل</button>
+                        <button onclick="deleteGame(${g.id})" class="px-2 py-1 bg-red-600/30 text-red-400 hover:bg-red-600 hover:text-white rounded">حذف نهائي</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function saveGameFromAdmin(e) {
+            e.preventDefault();
+            const editId = document.getElementById('editGameId').value;
+            const urlImg = document.getElementById('gameImageUrl').value;
+            
+            // Choose uploaded image if available, else use URL input
+            const finalImage = uploadedBase64Image || urlImg || fallbackImage;
+
+            const gameObj = {
+                id: editId ? parseInt(editId) : Date.now(),
+                title: document.getElementById('gameTitleAr').value,
+                originalTitle: document.getElementById('gameTitleEn').value,
+                platform: document.getElementById('gamePlatform').value,
+                price: parseFloat(document.getElementById('gamePrice').value),
+                oldPrice: document.getElementById('gameOldPrice').value ? parseFloat(document.getElementById('gameOldPrice').value) : null,
+                rating: parseFloat(document.getElementById('gameRating').value) || 4.8,
+                image: finalImage,
+                description: document.getElementById('gameDescription').value || 'لا يوجد وصف.'
+            };
+
+            if (editId) {
+                const idx = gamesData.findIndex(g => g.id === parseInt(editId));
+                if (idx > -1) gamesData[idx] = gameObj;
+            } else {
+                gamesData.unshift(gameObj);
+            }
+
+            saveGamesToStorage();
+            renderGames();
+            renderAdminGamesList();
+            resetAdminForm();
+            alert('تم حفظ اللعبة بنجاح!');
+        }
+
+        function editGame(id) {
+            const g = gamesData.find(item => item.id === id);
+            if (!g) return;
+
+            document.getElementById('editGameId').value = g.id;
+            document.getElementById('gameTitleAr').value = g.title;
+            document.getElementById('gameTitleEn').value = g.originalTitle;
+            document.getElementById('gamePlatform').value = g.platform;
+            document.getElementById('gamePrice').value = g.price;
+            document.getElementById('gameOldPrice').value = g.oldPrice || '';
+            document.getElementById('gameRating').value = g.rating;
+            
+            if(g.image.startsWith('data:image')) {
+                uploadedBase64Image = g.image;
+                document.getElementById('imagePreview').src = g.image;
+                document.getElementById('imagePreviewContainer').classList.remove('hidden');
+                document.getElementById('gameImageUrl').value = '';
+            } else {
+                uploadedBase64Image = "";
+                document.getElementById('gameImageUrl').value = g.image;
+                document.getElementById('imagePreviewContainer').classList.add('hidden');
+            }
+
+            document.getElementById('gameDescription').value = g.description;
+            document.getElementById('formTitle').innerHTML = '<i class="fa-solid fa-pen-to-square"></i> تعديل اللعبة الحالية';
+        }
+
+        function deleteGame(id) {
+            if (confirm('هل أنت تأكد من إزالة هذه اللعبة نهائياً من المتجر؟')) {
+                gamesData = gamesData.filter(g => g.id !== id);
+                saveGamesToStorage();
+                renderGames();
+                renderAdminGamesList();
+            }
+        }
+
+        function resetAdminForm() {
+            document.getElementById('editGameId').value = '';
+            document.getElementById('gameTitleAr').value = '';
+            document.getElementById('gameTitleEn').value = '';
+            document.getElementById('gamePrice').value = '';
+            document.getElementById('gameOldPrice').value = '';
+            document.getElementById('gameImageUrl').value = '';
+            document.getElementById('gameFileInput').value = '';
+            document.getElementById('gameDescription').value = '';
+            document.getElementById('imagePreviewContainer').classList.add('hidden');
+            uploadedBase64Image = "";
+            document.getElementById('formTitle').innerHTML = '<i class="fa-solid fa-plus-circle"></i> إضافة لعبة جديدة';
+        }
+
+        // Cart Actions
+        function addToCart(gameId) {
+            const game = gamesData.find(g => g.id === gameId);
+            const existingIndex = cart.findIndex(item => item.id === gameId);
+
+            if (existingIndex > -1) {
+                cart[existingIndex].quantity += 1;
+            } else {
+                cart.push({ ...game, quantity: 1 });
+            }
+
+            updateCartUI();
+            toggleCart(true);
+        }
+
+        function removeFromCart(gameId) {
+            cart = cart.filter(item => item.id !== gameId);
+            updateCartUI();
+        }
+
+        function changeQuantity(gameId, delta) {
+            const item = cart.find(i => i.id === gameId);
+            if (item) {
+                item.quantity += delta;
+                if (item.quantity <= 0) {
+                    removeFromCart(gameId);
+                } else {
+                    updateCartUI();
+                }
+            }
+        }
+
+        function updateCartUI() {
+            const container = document.getElementById('cartItemsContainer');
+            const totalElem = document.getElementById('cartTotal');
+            const countElem = document.getElementById('cartCount');
+
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+            countElem.innerText = totalItems;
+            totalElem.innerText = `${totalPrice} ج.م`;
+
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-16 text-gray-400 space-y-3">
+                        <i class="fa-solid fa-cart-flatbed text-5xl text-gray-600"></i>
+                        <p class="text-base font-semibold">سلة المشتريات فارغة حالياً</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = cart.map(item => `
+                <div class="flex items-center gap-3 bg-ps-darkBg p-3 rounded-xl border border-gray-800">
+                    <img src="${item.image}" onerror="this.onerror=null; this.src='${fallbackImage}'" class="w-14 h-16 object-cover rounded-lg" alt="${item.title}">
+                    <div class="flex-1">
+                        <h4 class="font-bold text-sm text-white">${item.title}</h4>
+                        <span class="text-xs text-ps-accent font-semibold">${item.price} ج.م</span>
+                        <div class="flex items-center gap-2 mt-2">
+                            <button onclick="changeQuantity(${item.id}, -1)" class="w-6 h-6 bg-gray-800 hover:bg-gray-700 text-white rounded flex items-center justify-center text-xs">-</button>
+                            <span class="text-xs font-bold text-white">${item.quantity}</span>
+                            <button onclick="changeQuantity(${item.id}, 1)" class="w-6 h-6 bg-gray-800 hover:bg-gray-700 text-white rounded flex items-center justify-center text-xs">+</button>
+                        </div>
+                    </div>
+                    <button onclick="removeFromCart(${item.id})" class="text-gray-500 hover:text-red-500 p-2">
+                        <i class="fa-solid fa-trash-can"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function toggleCart(forceOpen = false) {
+            const drawer = document.getElementById('cartDrawer');
+            if (forceOpen) {
+                drawer.classList.remove('hidden');
+            } else {
+                drawer.classList.toggle('hidden');
+            }
+        }
+
+        function openDetailsModal(gameId) {
+            const game = gamesData.find(g => g.id === gameId);
+            const container = document.getElementById('modalContent');
+
+            container.innerHTML = `
+                <div class="relative h-64 sm:h-80">
+                    <img src="${game.image}" onerror="this.onerror=null; this.src='${fallbackImage}'" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-ps-cardBg via-ps-cardBg/40 to-transparent"></div>
+                    <button onclick="closeDetailsModal()" class="absolute top-4 left-4 bg-black/60 text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-black transition">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+                <div class="p-6 sm:p-8 space-y-4 -mt-12 relative">
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs font-black px-3 py-1 rounded-md ${game.platform === 'PS5' ? 'bg-white text-black' : 'bg-ps-ps4 text-white'}">${game.platform}</span>
+                        <span class="text-xs text-yellow-400 font-bold"><i class="fa-solid fa-star"></i> ${game.rating} / 5.0</span>
+                    </div>
+                    <h2 class="text-2xl sm:text-3xl font-black text-white">${game.title}</h2>
+                    <p class="text-xs text-gray-400">${game.originalTitle}</p>
+                    <p class="text-sm text-gray-300 leading-relaxed">${game.description}</p>
+                    
+                    <div class="pt-4 flex items-center justify-between border-t border-gray-800">
+                        <div>
+                            <span class="text-xs text-gray-400 block">السعر المطلوب</span>
+                            <span class="text-2xl font-black text-ps-accent">${game.price} ج.م</span>
+                        </div>
+                        <button onclick="addToCart(${game.id}); closeDetailsModal();" class="px-6 py-3 bg-ps-lightBlue hover:bg-blue-600 text-white font-bold rounded-xl transition flex items-center gap-2 glow-blue">
+                            <i class="fa-solid fa-cart-plus"></i> إضافة إلى السلة
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('detailsModal').classList.remove('hidden');
+        }
+
+        function closeDetailsModal() {
+            document.getElementById('detailsModal').classList.add('hidden');
+        }
+
+        function openCheckout() {
+            if (cart.length === 0) {
+                alert('سلة المشتريات فارغة!');
+                return;
+            }
+            toggleCart();
+            document.getElementById('checkoutModal').classList.remove('hidden');
+        }
+
+        function closeCheckoutModal() {
+            document.getElementById('checkoutModal').classList.add('hidden');
+        }
+
+        function submitOrder(e) {
+            e.preventDefault();
+            alert('تم استلام طلبك بنجاح! سيتم التواصل معك عبر الواتساب لإرسال كود اللعبة وتأكيد الدفع.');
+            cart = [];
+            updateCartUI();
+            closeCheckoutModal();
+        }
+
+        renderGames();
+        updateCartUI();
+    </script>
+</body>
+</html>
